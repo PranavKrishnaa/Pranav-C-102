@@ -1,42 +1,39 @@
-from os import access
-from tkinter import DOTBOX
-from tracemalloc import Snapshot
-from cv2 import VideoCapture
-import dropbox
-import time
-import random
 import cv2
+from time import time
+from random import randint
+import dropbox
 
-startTime=time.time()
+start_time = time()
 
-
-def take_Snapshot():
-    number=random.randint(0,100)
-    VideoCaptureObject=cv2.VideoCapture(0)
-    result=True    
+def take_snapshot():
+    num = randint(1,100)
+    #video capture object from cv2
+    videoCaptureObject = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+    result = True
     while(result):
-        ret,frame=VideoCaptureObject.read()
-        imageName="image"+str(number)+".png"
-        cv2.imwrite(imageName, frame)
-        startTime=time.time()
-        result=False
-    return imageName
-    print("Picture Taken")
-    VideoCaptureObject.release()
+        ret,frame = videoCaptureObject.read()
+        img_name = "img" + str(num) + ".png"
+        cv2.imwrite(img_name,frame)
+        #start_time = time()
+        result = False
+        return img_name
+    print("Snapshot taken")
+    videoCaptureObject.release()
     cv2.destroyAllWindows()
 
-def uploadImage(imageName):
-    access_token="sl.BHrB42Vj5EkYn9UDB73J8va7YOMQla1NvWItGJQP7jrOGDyqm3cLtbGW26noWOqztiOEuIxpedJ1MG6NkF4m1t_4mPrqgMdXgT-sMRdf6RR0lv1hyyfDsG6USp7qiEtTOXGdbcWqFzQ"
-    file=imageName
-    filefrom=file
-    fileto="/imageFolder/"+(imageName)
-    dbx=dropbox.Dropbox(access_token)
-    with open(filefrom, 'rb') as f:
-        dbx.files_upload(f.read(),fileto,mode=dropbox.files.WriteMode.overwrite)
-        print("file Uploaded")
+def upload_file(img_name):
+    access_token = "YN6QGBztqNwAAAAAAAAAAcpVBInPhZgtreP6g8ehCjHv0pkOOIOf95pBHoX-lYge"
+    file_from = img_name
+    file_to = "/Python/" + img_name
+    dbx = dropbox.Dropbox(access_token)
+    with open(file_from,'rb') as f:
+        dbx.files_upload(f.read(),file_to,mode = dropbox.files.WriteMode.overwrite)
+        print("File Uploaded")
+
 def main():
     while(True):
-        if((time.time()-startTime)>=5):
-            name=take_Snapshot()
-            uploadImage(name)
+        if ((time() - start_time) >= 5):
+            name = take_snapshot()
+            upload_file(name)
+
 main()
